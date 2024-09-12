@@ -99,8 +99,8 @@ updateHook:   #We Declaration of the update hook´s values
   script: |
   #!/bin/bash
 
-  # Directory containing our scripts
-    SCRIPT_DIR="/our_path/to/scripts"
+  # Directory containing our scripts (I assume it exists)
+    SCRIPT_DIR="/our_path/to/scripts"    
 
   # We get a list of scripts
     SCRIPTS=($SCRIPT_DIR/*)
