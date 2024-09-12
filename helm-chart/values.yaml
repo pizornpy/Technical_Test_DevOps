@@ -75,17 +75,13 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector:     #Forzamos 
-  ping-allowed: "true"
-
-
-affinity:    #This to avoid pods from being scheduled on a node with another pod of the same type
+affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
     - labelSelector:
-        matchExpressions:
-        - key: app
-          operator: In
+        matchExpressions: 
+        - key: app                          #A ping pod wont appear where a another one already exists
+          operator: In 
           values:
           - ping
       topologyKey: "kubernetes.io/hostname"
@@ -93,12 +89,33 @@ affinity:    #This to avoid pods from being scheduled on a node with another pod
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: topology.kubernetes.io/zone
+        - key: topology.kubernetes.io/zone   #We spread pods across AZs 
           operator: Exists
+        - key: ping-restricted                #We isolate nodes with the ping-restricted label
+          operator: DoesNotExist
 
-updateHook:   #Declaration of the update hook´s values
+updateHook:   #We Declaration of the update hook´s values
   enabled: true
   script: |
-    #!/bin/bash
-    echo "Running script"
+  #!/bin/bash
+
+  # Directory containing our scripts
+    SCRIPT_DIR="/our_path/to/scripts"
+
+  # We get a list of scripts
+    SCRIPTS=($SCRIPT_DIR/*)
+
+  # We check if there are any scripts in the directory
+    if [ ${#SCRIPTS[@]} -eq 0 ]; then
+    echo "No scripts found in $SCRIPT_DIR"
+    exit 1
+    fi
+
+  # We pick a random script
+    RANDOM_SCRIPT=${SCRIPTS[$RANDOM % ${#SCRIPTS[@]}]}
+
+  # We execute the random script
+    echo "Running script: $RANDOM_SCRIPT"
+    bash "$RANDOM_SCRIPT"
+
     
