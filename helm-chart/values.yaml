@@ -74,3 +74,31 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+nodeSelector:     #Forzamos 
+  ping-allowed: "true"
+
+
+affinity:    #This to avoid pods from being scheduled on a node with another pod of the same type
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - ping
+      topologyKey: "kubernetes.io/hostname"
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: topology.kubernetes.io/zone
+          operator: Exists
+
+updateHook:   #Declaration of the update hook´s values
+  enabled: true
+  script: |
+    #!/bin/bash
+    echo "Running script"
+    
