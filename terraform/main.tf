@@ -39,3 +39,20 @@ resource "azurerm_role_assignment" "new_az_role_assignment" {
   scope                            = azurerm_container_registry.destionation_acr.id
   skip_service_principal_aad_check = true
 }
+
+
+resource "null_resource" "import_helm_charts" {
+  for_each = toset(var.helm_charts)
+
+  provisioner "local-exec" {
+    command = <<EOT
+    az acr import --name ${azurerm_container_registry.destination_acr.name} \
+      --source reference.azurecr.io/helm/${each.key}:latest \
+      --source-username ${var.reference_registry_username} \
+      --source-password ${var.reference_registry_password} \
+      --subscription c9e7611c-d508-4f-aede-0bedfabc1560 \
+      --repository helm/${each.key} \
+      --force
+    EOT
+  }
+}
