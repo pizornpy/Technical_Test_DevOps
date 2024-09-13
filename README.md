@@ -18,7 +18,7 @@ En segundo lugar, la carpeta /terraform contiene la respuesta al segundo ejercic
 Hay una rama no terminada (resource creation branch) en la que se crean el grupo de recursos y el cluster de AKS, tras leer la tercera pregunta me he dado cuenta de que podía asumir la existencia de estos recursos, entonces he optado por separarlo en una rama a parte y cambiar develop.
     Con respecto a este segundo ejercicio decir que he trabajado más con AWS que con Azure, entonces me he apoyado en la documentación oficial de terraform (https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry#example-usage-attaching-a-container-registry-to-a-kubernetes-cluster)
 
-    El módulo de terraform:
+El módulo de terraform:
     Obtiene información del grupo de recursos existente.
     Obtiene información del clúster de AKS existente
     Crea un registro de contenedores en Azure con SKU Premium.
@@ -29,7 +29,7 @@ Hay una rama no terminada (resource creation branch) en la que se crean el grupo
 En tercer lugar, en el directorio .github\workflows está deploy-helm-chart.yml
     No tengo mucha experiencia con los workflows de github, entonces he optado por buscar en la documentación oficial y adaptar, según he visto conveniente esto: https://github.com/actions/starter-workflows/blob/main/deployments/azure-kubernetes-service-helm.yml
     
-    A grandes rasgos, el workflow:
+A grandes rasgos, el workflow:
     Clona el código del repositorio.
     Configura Terraform.
     Inicia sesión en Azure.
