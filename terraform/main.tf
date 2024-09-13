@@ -1,18 +1,18 @@
 #Part of this is coming from the official docs https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry#example-usage-attaching-a-container-registry-to-a-kubernetes-cluster
 
 resource "azurerm_resource_group" "new_resource_group" {
-  name     = "example-resources"
-  location = "West Europe"
+  name     = "test-resource-group"
+  location = "West Europe"    #I dont know which one so i leave as is 
 }
 
-resource "azurerm_container_registry" "destionation_acr" {
+resource "azurerm_container_registry" "destination_acr" {
   name                = "instsance.azurerc.io"
   resource_group_name = azurerm_resource_group.new_resource_group.name
   location            = azurerm_resource_group.new_resource_group.location
   sku                 = "Premium"
 }
 
-resource "azurerm_kubernetes_cluster" "new_cluster" {    
+resource "azurerm_kubernetes_cluster" "new_cluster" {     #Cluster creation
   name                = "new_aks_cluster"
   location            = azurerm_resource_group.new_resource_group.location
   resource_group_name = azurerm_resource_group.new_resource_group.name
@@ -33,15 +33,15 @@ resource "azurerm_kubernetes_cluster" "new_cluster" {
   }
 }
 
-resource "azurerm_role_assignment" "new_az_role_assignment" {
-  principal_id                     = azurerm_kubernetes_cluster.new_cluster.kubelet_identity[0].object_id
+resource "azurerm_role_assignment" "new_az_role_assignment" {   #Role assigment to pull images
+  principal_id                     = azurerm_kubernetes_cluster.new_cluster.kubelet_identity[0].object_id   
   role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.destionation_acr.id
+  scope                            = azurerm_container_registry.destination_acr.id
   skip_service_principal_aad_check = true
 }
 
 
-resource "null_resource" "import_helm_charts" {
+resource "null_resource" "import_helm_charts" {   #null resource to import charts
   for_each = toset(var.helm_charts)
 
   provisioner "local-exec" {
@@ -55,4 +55,23 @@ resource "null_resource" "import_helm_charts" {
       --force
     EOT
   }
+}
+
+
+# We deploy Helm Charts to AKS Cluster
+resource "helm_release" "deploy_charts" {
+  for_each = toset(var.helm_charts)
+
+  name       = each.value
+  repository = "oci://${azurerm_container_registry.destination_acr.login_server}/helm"
+  chart      = each.value
+  version    = "latest"
+
+  # We use the ACR's login server for authentication
+  set {
+    name  = "global.image.repository"
+    value = azurerm_container_registry.destination_acr.login_server
+  }
+
+  depends_on = [null_resource.import_helm_charts]
 }
