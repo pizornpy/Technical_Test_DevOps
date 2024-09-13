@@ -27,6 +27,10 @@ spec:
       serviceAccountName: {{ include "ping.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.affinity }}
+      affinity:    #To include the affinities defined in the values.yaml file, took this as inspiration https://github.com/hashicorp/hcp-terraform-operator/pull/350/files
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

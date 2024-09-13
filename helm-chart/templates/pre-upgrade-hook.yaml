@@ -1,0 +1,20 @@
+{{- if .Values.updateHook.enabled }}   #validation to run the updateHook, used this as a partial source: https://helm.sh/docs/topics/charts_hooks/
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}"
+  annotations:
+    "helm.sh/hook": pre-upgrade #Wasn´t sure if pre-upgrade or post-install was more correct
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: "{{ .Release.Name }}" 
+        image: bash:5.1             
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            {{- .Values.updateHook.script | nindent 12 }}

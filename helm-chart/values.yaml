@@ -74,3 +74,48 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions: 
+        - key: app                          #A ping pod wont appear where a another one already exists
+          operator: In 
+          values:
+          - ping
+      topologyKey: "kubernetes.io/hostname"
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: topology.kubernetes.io/zone   #We spread pods across AZs 
+          operator: Exists
+        - key: ping-restricted                #We isolate nodes with the ping-restricted label
+          operator: DoesNotExist
+
+updateHook:   #We Declaration of the update hook´s values
+  enabled: true
+  script: |
+  #!/bin/bash
+
+  # Directory containing our scripts (I assume it exists)
+    SCRIPT_DIR="/our_path/to/scripts"    
+
+  # We get a list of scripts
+    SCRIPTS=($SCRIPT_DIR/*)
+
+  # We check if there are any scripts in the directory
+    if [ ${#SCRIPTS[@]} -eq 0 ]; then
+    echo "No scripts found in $SCRIPT_DIR"
+    exit 1
+    fi
+
+  # We pick a random script
+    RANDOM_SCRIPT=${SCRIPTS[$RANDOM % ${#SCRIPTS[@]}]}
+
+  # We execute the random script
+    echo "Running script: $RANDOM_SCRIPT"
+    bash "$RANDOM_SCRIPT"
+
+    
