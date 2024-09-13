@@ -7,15 +7,15 @@ resource "azurerm_resource_group" "new_resource_group" {
 
 resource "azurerm_container_registry" "destionation_acr" {
   name                = "instsance.azurerc.io"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.new_resource_group.name
+  location            = azurerm_resource_group.new_resource_group.location
   sku                 = "Premium"
 }
 
 resource "azurerm_kubernetes_cluster" "new_cluster" {    
   name                = "new_aks_cluster"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.new_resource_group.location
+  resource_group_name = azurerm_resource_group.new_resource_group.name
   dns_prefix          = "new_aks_cluster"
 
   default_node_pool {
