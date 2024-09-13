@@ -1,37 +1,23 @@
 #Part of this is coming from the official docs https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry#example-usage-attaching-a-container-registry-to-a-kubernetes-cluster
 
-resource "azurerm_resource_group" "new_resource_group" {
+data "azurerm_resource_group" "existing_resource_group" {  #Changed after seeing that i can assume its created
   name     = "test-resource-group"
-  location = "West Europe"    #I dont know which one so i leave as is 
+  location = "West Europe"    #I dont know which one so i leave as is
 }
 
-resource "azurerm_container_registry" "destination_acr" {
+data "azurerm_kubernetes_cluster" "existing_cluster" {
+  name                = "existing_aks_cluster"  
+  resource_group_name = data.azurerm_resource_group.existing_resource_group.name
+}
+
+resource "azurerm_container_registry" "destination_acr" { #Changed after seeing that i can assume its created
   name                = "instsance.azurerc.io"
-  resource_group_name = azurerm_resource_group.new_resource_group.name
-  location            = azurerm_resource_group.new_resource_group.location
+  resource_group_name = azurerm_resource_group.existing_resource_group.name
+  location            = azurerm_resource_group.existing_resource_group.location
   sku                 = "Premium"
 }
 
-resource "azurerm_kubernetes_cluster" "new_cluster" {     #Cluster creation
-  name                = "new_aks_cluster"
-  location            = azurerm_resource_group.new_resource_group.location
-  resource_group_name = azurerm_resource_group.new_resource_group.name
-  dns_prefix          = "new_aks_cluster"
 
-  default_node_pool {
-    name       = "default"
-    node_count = 1 
-    vm_size    = "Standard_D2_v2"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  tags = {
-    Environment = "Production"
-  }
-}
 
 resource "azurerm_role_assignment" "new_az_role_assignment" {   #Role assigment to pull images
   principal_id                     = azurerm_kubernetes_cluster.new_cluster.kubelet_identity[0].object_id   
@@ -57,21 +43,3 @@ resource "null_resource" "import_helm_charts" {   #null resource to import chart
   }
 }
 
-
-# We deploy Helm Charts to AKS Cluster
-resource "helm_release" "deploy_charts" {
-  for_each = toset(var.helm_charts)
-
-  name       = each.value
-  repository = "oci://${azurerm_container_registry.destination_acr.login_server}/helm"
-  chart      = each.value
-  version    = "latest"
-
-  # We use the ACR's login server for authentication
-  set {
-    name  = "global.image.repository"
-    value = azurerm_container_registry.destination_acr.login_server
-  }
-
-  depends_on = [null_resource.import_helm_charts]
-}
