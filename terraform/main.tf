@@ -56,22 +56,3 @@ resource "null_resource" "import_helm_charts" {   #null resource to import chart
     EOT
   }
 }
-
-
-# We deploy Helm Charts to AKS Cluster
-resource "helm_release" "deploy_charts" {
-  for_each = toset(var.helm_charts)
-
-  name       = each.value
-  repository = "oci://${azurerm_container_registry.destination_acr.login_server}/helm"
-  chart      = each.value
-  version    = "latest"
-
-  # We use the ACR's login server for authentication
-  set {
-    name  = "global.image.repository"
-    value = azurerm_container_registry.destination_acr.login_server
-  }
-
-  depends_on = [null_resource.import_helm_charts]
-}
