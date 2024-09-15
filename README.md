@@ -10,8 +10,7 @@ El repo tiene 3 partes principales, en primer lugar, la carpeta /helm-chart, que
     El aislamiento de nodos con concretos, para esto he añadido una comprobación para que los pods no se deplieguen en nodos que tengan la etiqueta, que hay que añdir ping-restricted.
     También, la antiafinidad en los pods para que no compartan nodo.
     El despliegue en distantas zonas de disponibilidad de los pods
-    El script aleatorio, de una lista que se supone, para ello he usado un update hook con un script de bash. Para el update hook he usado esta fuente https://helm.sh/docs/topics/charts_hooks/
-
+    El script aleatorio, de una lista que se supone, para ello he usado un update hook con un script de bash. Para el update hook he usado esta fuente https://helm.sh/docs/topics/charts_hooks/. He supuesto una lista de escripts donde escoger, alojados en un volumen por ejemplo, por escribir un script en bash un poco más elaborado. 
 
 
 
@@ -29,7 +28,7 @@ El módulo de terraform:
 
 
 En tercer lugar, en el directorio .github\workflows está deploy-helm-chart.yml
-    No tengo mucha experiencia con los workflows de github, entonces he optado por buscar en la documentación oficial y adaptar, según he visto conveniente esto: https://github.com/actions/starter-workflows/blob/main/deployments/azure-kubernetes-service-helm.yml
+    No tengo mucha experiencia con los workflows de github, entonces he optado por buscar en la documentación oficial y adaptar, según he visto conveniente esto: https://github.com/actions/starter-workflows/blob/main/deployments/azure-kubernetes-service-helm.yml A la hora de realizar un workflow, o en general cualquier tarea con la que tuviera poca experiencia, opto por buscar documentación oficial y apoyarme en miembros del equipo con más experiencia, como esto último no estaba disponible, he decidido buscar en internet información y apoyarme en documentación, foros y LLM como ChatGPT. 
     
 A grandes rasgos, el workflow:
 
