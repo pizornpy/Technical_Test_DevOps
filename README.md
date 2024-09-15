@@ -28,7 +28,7 @@ El módulo de terraform:
 
 
 En tercer lugar, en el directorio .github\workflows está deploy-helm-chart.yml
-    No tengo mucha experiencia con los workflows de github, entonces he optado por buscar en la documentación oficial y adaptar, según he visto conveniente esto: https://github.com/actions/starter-workflows/blob/main/deployments/azure-kubernetes-service-helm.yml A la hora de realizar un workflow, o en general cualquier tarea con la que tuviera poca experiencia, opto por buscar documentación oficial y apoyarme en miembros del equipo con más experiencia, como esto último no estaba disponible, he decidido buscar en internet información y apoyarme en documentación, foros y LLM como ChatGPT. 
+    No tengo mucha experiencia con los workflows de github, entonces he optado por buscar en la documentación oficial y adaptar, según he visto conveniente esto: https://github.com/actions/starter-workflows/blob/main/deployments/azure-kubernetes-service-helm.yml A la hora de realizar un workflow, o en general cualquier tarea con la que tuviera poca experiencia, opto por buscar documentación oficial y apoyarme en miembros del equipo con más experiencia, como esto último no estaba disponible, he decidido buscar información en internet y apoyarme en documentación, foros y LLM como ChatGPT. 
     
 A grandes rasgos, el workflow:
 
